@@ -72,4 +72,4 @@ Role panels:
 For a real production app, create the first admin manually in Firestore or through a private admin script instead of allowing public admin signup.
 =======
 A stock-market-inspired platform for analyzing and investing in local businesses using real-time analytics, LocalCoin (LCO), and AI-powered insights.
->>>>>>> 07fe48c926f42fc147b0e512e44ba8bb6b9e2566
+
