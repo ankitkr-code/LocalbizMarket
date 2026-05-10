@@ -1,4 +1,5 @@
 # LocalbizMarket
+<<<<<<< HEAD
 
 LocalbizMarket is a full-stack marketplace for local businesses, investors, business owners, and admins.
 
@@ -69,3 +70,6 @@ Role panels:
 - Admin: `/dashboard`, `/admin`, `/businesses`, `/add-business`, `/upload-purchase`, `/chatbot`
 
 For a real production app, create the first admin manually in Firestore or through a private admin script instead of allowing public admin signup.
+=======
+A stock-market-inspired platform for analyzing and investing in local businesses using real-time analytics, LocalCoin (LCO), and AI-powered insights.
+>>>>>>> 07fe48c926f42fc147b0e512e44ba8bb6b9e2566
