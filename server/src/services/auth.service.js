@@ -1,4 +1,4 @@
-import { createDocument, getDocument, listCollection, setDocument } from "./firestore.service.js";
+import { /*createDocument,*/ getDocument, listCollection, setDocument } from "./firestore.service.js";
 
 const validRoles = new Set(["investor", "business_owner", "admin"]);
 
@@ -7,14 +7,14 @@ export function normalizeRole(role) {
   return validRoles.has(normalized) ? normalized : "investor";
 }
 
-export async function registerUser(payload) {
+/*export async function registerUser(payload) {
   const role = normalizeRole(payload.role);
   return createDocument("users", {
     name: payload.name,
     email: payload.email,
     role
   }, "user");
-}
+} */
 
 export async function upsertUserProfile(uid, payload) {
   const existing = await getDocument("users", uid);

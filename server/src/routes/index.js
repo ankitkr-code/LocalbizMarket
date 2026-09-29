@@ -7,6 +7,7 @@ import purchaseRoutes from "./purchase.routes.js";
 import chartRoutes from "./chart.routes.js";
 import chatbotRoutes from "./chatbot.routes.js";
 import paymentRoutes from "./payment.routes.js";
+import activityRoutes from "./activity.routes.js";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/purchases", purchaseRoutes);
 router.use("/charts", chartRoutes);
 router.use("/chatbot", chatbotRoutes);
 router.use("/payments", paymentRoutes);
+router.use("/activity", activityRoutes);
 
 export default router;

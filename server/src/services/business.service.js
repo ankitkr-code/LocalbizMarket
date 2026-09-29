@@ -1,7 +1,13 @@
-import { createDocument, listCollection, updateDocument } from "./firestore.service.js";
+import { createDocument, listCollection, queryCollection, updateDocument } from "./firestore.service.js";
 
 export function getBusinesses() {
   return listCollection("businesses");
+}
+
+export function getBusinessesForRole({ role, userId }) {
+  if (role === "admin") return listCollection("businesses");
+  if (role === "business_owner") return queryCollection("businesses", [["ownerId", "==", userId]]);
+  return queryCollection("businesses", [["status", "==", "approved"]]);
 }
 
 export function addBusiness(payload, ownerId) {

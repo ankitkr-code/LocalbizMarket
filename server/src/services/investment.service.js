@@ -1,11 +1,10 @@
 import { getFirestore } from "../config/firebase.js";
-import { createDocument, getDocument, listCollection, updateDocument } from "./firestore.service.js";
+import { createDocument, getDocument, listCollection, queryCollection, updateDocument } from "./firestore.service.js";
 import { debitWallet } from "./wallet.service.js";
 
 export async function getInvestments(userId, role) {
-  const investments = await listCollection("investments");
-  if (role === "admin") return investments;
-  return investments.filter((investment) => investment.investorId === userId);
+  if (role === "admin") return listCollection("investments");
+  return queryCollection("investments", [["investorId", "==", userId]]);
 }
 
 export async function invest(payload, investorId) {
@@ -102,6 +101,7 @@ async function investWithMockStore(businessId, investorId, amount) {
     businessId: business.id,
     businessName: business.name,
     amount,
-    status: "active"
+    status: "active",
+    createdAt: new Date().toISOString()
   }, "investment");
 }

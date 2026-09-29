@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { api } from "../api.js";
 import { auth, firebaseReady } from "../firebase.js";
@@ -80,6 +80,14 @@ export function AuthProvider({ children }) {
     await loadProfile(credential.user);
   }
 
+  async function requestPasswordReset(email) {
+    if (!firebaseReady || !auth) {
+      throw new Error("Firebase is not configured yet. Add your client Firebase env values.");
+    }
+
+    await sendPasswordResetEmail(auth, email);
+  }
+
   async function logout() {
     if (auth) {
       await signOut(auth);
@@ -98,6 +106,7 @@ export function AuthProvider({ children }) {
       logout,
       profile,
       register,
+      requestPasswordReset,
       role: normalizeRole(profile?.role)
     }),
     [firebaseUser, isLoading, profile]

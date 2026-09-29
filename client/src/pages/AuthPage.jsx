@@ -13,7 +13,7 @@ export default function AuthPage() {
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState("");
-  const { firebaseReady, isAuthenticated, isLoading, login, register } = useAuth();
+  const { firebaseReady, isAuthenticated, isLoading, login, register, requestPasswordReset } = useAuth();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -33,6 +33,12 @@ export default function AuthPage() {
     setStatus("Please wait...");
 
     try {
+      if (mode === "forgot") {
+        await requestPasswordReset(form.email);
+        setStatus("If an account with that email exists, password-reset instructions will be sent to its registered email address.");
+        return;
+      }
+
       if (mode === "register") {
         await register(form);
       } else {
@@ -40,13 +46,17 @@ export default function AuthPage() {
       }
       navigate("/dashboard");
     } catch (error) {
-      setStatus(error.message);
+      setStatus(mode === "forgot"
+        ? "If an account with that email exists, password-reset instructions will be sent to its registered email address."
+        : error.message);
     }
   }
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="section-title">{mode === "login" ? "Sign In" : "Create Account"}</h1>
+      <h1 className="section-title">
+        {mode === "login" ? "Sign In" : mode === "register" ? "Create Account" : "Reset Password"}
+      </h1>
       {!firebaseReady && (
         <p className="mt-4 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           Firebase is not configured yet. Add values to `client/.env.local` from your Firebase web app.
@@ -73,20 +83,36 @@ export default function AuthPage() {
           <span className="text-sm font-medium">Email</span>
           <input className="field" name="email" value={form.email} onChange={updateField} type="email" required />
         </label>
-        <label className="grid gap-2">
-          <span className="text-sm font-medium">Password</span>
-          <input className="field" name="password" value={form.password} onChange={updateField} type="password" minLength={6} required />
-        </label>
-        <button className="btn-primary" type="submit">{mode === "login" ? "Sign in" : "Create account"}</button>
+        {mode !== "forgot" && (
+          <label className="grid gap-2">
+            <span className="text-sm font-medium">Password</span>
+            <input className="field" name="password" value={form.password} onChange={updateField} type="password" minLength={6} required />
+          </label>
+        )}
+        {mode === "login" && (
+          <button
+            className="justify-self-start text-sm font-semibold text-leaf hover:underline"
+            type="button"
+            onClick={() => {
+              setStatus("");
+              setMode("forgot");
+            }}
+          >
+            Forgot password?
+          </button>
+        )}
+        <button className="btn-primary" type="submit">
+          {mode === "login" ? "Sign in" : mode === "register" ? "Create account" : "Send reset email"}
+        </button>
         <button
           className="btn-secondary"
           type="button"
           onClick={() => {
             setStatus("");
-            setMode((current) => (current === "login" ? "register" : "login"));
+            setMode((current) => current === "login" ? "register" : "login");
           }}
         >
-          {mode === "login" ? "Create a new account" : "Already have an account"}
+          {mode === "login" ? "Create a new account" : mode === "register" ? "Already have an account" : "Back to sign in"}
         </button>
         {status && <p className="rounded bg-slate-50 p-3 text-sm text-slate-700">{status}</p>}
       </form>

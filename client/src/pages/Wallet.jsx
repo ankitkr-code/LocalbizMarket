@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api.js";
 import { useAuth } from "../auth/AuthContext.jsx";
+import { useInvestments } from "../hooks/useInvestments.js";
 import { useWallet } from "../hooks/useWallet.js";
 
 export default function Wallet() {
@@ -10,8 +11,16 @@ export default function Wallet() {
   const [status, setStatus] = useState("");
   const { firebaseUser, getToken } = useAuth();
   const { error, isLoading, reload, wallet } = useWallet();
+  const {
+    error: investmentsError,
+    investments,
+    isLoading: investmentsLoading,
+    reload: reloadInvestments,
+    totalAmount
+  } = useInvestments();
   const balance = Number(wallet?.balance || 0);
   const transactions = [...(wallet?.transactions || [])].reverse();
+  const orderedInvestments = [...investments].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
   async function handleAddFunds(event) {
     event.preventDefault();
@@ -69,6 +78,32 @@ export default function Wallet() {
               <span className={tx.type === "credit" ? "font-semibold text-leaf" : "font-semibold text-clay"}>
                 {tx.type === "credit" ? "+" : "-"}Rs. {Number(tx.amount || 0).toLocaleString("en-IN")}
               </span>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="rounded-md border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
+        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="section-title">Investment History</h2>
+            <p className="mt-1 text-sm text-slate-600">Total invested: Rs. {totalAmount.toLocaleString("en-IN")}</p>
+          </div>
+          <button className="btn-secondary" type="button" onClick={reloadInvestments}>Refresh</button>
+        </div>
+        {investmentsLoading && <p className="mt-4 rounded bg-slate-50 p-3 text-sm text-slate-600">Loading investments...</p>}
+        {investmentsError && <p className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700">{investmentsError}</p>}
+        {!investmentsLoading && !investmentsError && orderedInvestments.length === 0 && (
+          <p className="mt-4 rounded bg-slate-50 p-3 text-sm text-slate-600">No investment records yet.</p>
+        )}
+        <div className="mt-4 divide-y divide-slate-100">
+          {orderedInvestments.map((investment) => (
+            <div key={investment.id} className="grid gap-2 py-3 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+              <div>
+                <p className="font-semibold">{investment.businessName || "Business"}</p>
+                <p className="text-sm text-slate-600">{investment.createdAt ? new Date(investment.createdAt).toLocaleString() : "Date not available"}</p>
+              </div>
+              <span className="rounded bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">{investment.status || "active"}</span>
+              <p className="font-semibold">Rs. {Number(investment.amount || 0).toLocaleString("en-IN")}</p>
             </div>
           ))}
         </div>

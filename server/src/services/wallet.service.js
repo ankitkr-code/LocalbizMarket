@@ -1,4 +1,5 @@
 import { getDocument, setDocument } from "./firestore.service.js";
+import { validateAmount, createTransaction } from "./wallet.validation.js";
 
 export async function findWallet(userId) {
   const wallet = await getDocument("wallets", userId);
@@ -14,17 +15,8 @@ export async function findWallet(userId) {
 
 export async function creditWallet(userId, amount) {
   const wallet = await findWallet(userId);
-  const value = Number(amount);
-  if (!Number.isFinite(value) || value <= 0) {
-    throw Object.assign(new Error("Amount must be greater than zero"), { status: 400 });
-  }
-
-  const transaction = {
-    type: "credit",
-    amount: value,
-    label: "Wallet deposit",
-    createdAt: new Date().toISOString()
-  };
+  const value = validateAmount(amount, "Amount");
+  const transaction = createTransaction("credit", value, "Wallet deposit");
 
   return setDocument("wallets", userId, {
     balance: Number(wallet.balance || 0) + value,
@@ -34,22 +26,14 @@ export async function creditWallet(userId, amount) {
 
 export async function debitWallet(userId, amount, label) {
   const wallet = await findWallet(userId);
-  const value = Number(amount);
-  if (!Number.isFinite(value) || value <= 0) {
-    throw Object.assign(new Error("Amount must be greater than zero"), { status: 400 });
-  }
+  const value = validateAmount(amount, "Amount");
 
   const balance = Number(wallet.balance || 0);
   if (balance < value) {
     throw Object.assign(new Error("Insufficient wallet balance"), { status: 400 });
   }
 
-  const transaction = {
-    type: "debit",
-    amount: value,
-    label,
-    createdAt: new Date().toISOString()
-  };
+  const transaction = createTransaction("debit", value, label);
 
   return setDocument("wallets", userId, {
     balance: balance - value,

@@ -1,6 +1,6 @@
-import { findUserByEmail, getUserProfile, registerUser, upsertUserProfile } from "../services/auth.service.js";
+import { /*findUserByEmail,*/ getUserProfile, /*registerUser,*/ upsertUserProfile } from "../services/auth.service.js";
 
-export async function register(req, res, next) {
+/*export async function register(req, res, next) {
   try {
     const user = await registerUser(req.body);
     res.status(201).json({ user });
@@ -19,7 +19,7 @@ export async function login(req, res, next) {
   } catch (error) {
     next(error);
   }
-}
+} */
 
 export async function getMe(req, res, next) {
   try {
